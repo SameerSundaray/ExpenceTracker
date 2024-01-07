@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        #app {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, select, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.delete {
+            background-color: #d9534f;
+        }
+
+        button.edit {
+            background-color: #337ab7;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Expense Tracker</h1>
+
+        <label for="expenseAmount">Expense Amount:</label>
+        <input type="number" id="expenseAmount" placeholder="Enter expense amount">
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" placeholder="Enter description">
+
+        <label for="category">Category:</label>
+        <select id="category">
+            <option value="shoe">Shoe</option>
+            <option value="movie">Movie</option>
+            <option value="food">Food</option>
+            <option value="electricity">Electricity</option>
+            <option value="fuel">Fuel</option>
+        </select>
+
+        <button onclick="addExpense(event)">Add Expense</button>
+
+        <div id="expenseList">
+            <!-- Expense list will be displayed here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        let expenses = [];
+        let editIndex = -1; // To keep track of the expense being edited
+
+        // Asynchronous function to simulate an asynchronous operation
+        async function simulateAsyncOperation() {
+            return new Promise(resolve => {
+                // Simulating an asynchronous operation with a delay
+                setTimeout(() => {
+                    resolve();
+                }, 1000); // Simulating a delay of 1 second
+            });
+        }
+
+        async function addExpense(event) {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+
+            const expenseAmount = document.getElementById('expenseAmount').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+
+            if (expenseAmount.trim() === '' || isNaN(expenseAmount) || expenseAmount <= 0 || description.trim() === '') {
+                alert('Please enter valid expense details.');
+                return;
+            }
+
+            // Simulating an asynchronous operation
+            await simulateAsyncOperation();
+
+            if (editIndex !== -1) {
+                // If editIndex is not -1, update the existing expense
+                expenses[editIndex] = { amount: parseFloat(expenseAmount), description, category };
+                editIndex = -1; // Reset editIndex after editing
+            } else {
+                // Otherwise, add a new expense
+                expenses.push({ amount: parseFloat(expenseAmount), description, category });
+            }
+
+            displayExpenses();
+            clearInputs();
+        }
+
+        function displayExpenses() {
+            const expenseListDiv = document.getElementById('expenseList');
+            expenseListDiv.innerHTML = '<h2>Expenses</h2>';
+
+            expenses.forEach((expense, index) => {
+                const expenseDiv = document.createElement('div');
+                expenseDiv.innerHTML = `<p>Amount: $${expense.amount.toFixed(2)} | Description: ${expense.description} | Category: ${expense.category}</p>`;
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'edit';
+                editButton.onclick = () => editExpense(index);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete';
+                deleteButton.onclick = () => deleteExpense(index);
+
+                expenseDiv.appendChild(editButton);
+                expenseDiv.appendChild(deleteButton);
+                expenseListDiv.appendChild(expenseDiv);
+            });
+        }
+
+        function editExpense(index) {
+            // Set editIndex to the selected index for editing
+            editIndex = index;
+
+            // Populate input fields with existing data for editing
+            document.getElementById('expenseAmount').value = expenses[index].amount;
+            document.getElementById('description').value = expenses[index].description;
+            document.getElementById('category').value = expenses[index].category;
+        }
+
+        function deleteExpense(index) {
+            expenses.splice(index, 1);
+            displayExpenses();
+        }
+
+        function clearInputs() {
+            // Reset input fields after adding/editing
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = 'shoe'; // Default category
+        }
+    </script>
+</body>
+</html>
